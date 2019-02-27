@@ -1,0 +1,19 @@
+This bootloader use the first 2KByte region
+copy code from the half-upper to the flash base address + 2KByte
+the last 2KByte in the flash is used to save program parameters as free.
+
+	memory region
+
+-----------------------------
+|	program parameters 		|
+|		(2KBytes)			|
+-----------------------------
+|	Temporary Code Space	|
+|	(1/2 ROM - 2KBytes)		|
+-----------------------------
+|	User application area	|
+|	(1/2 ROM - 2KBytes)		|
+-----------------------------
+|	Bootloader code area	|
+|		(2KBytes)			|
+-----------------------------
