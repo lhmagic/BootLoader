@@ -65,7 +65,9 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+uint32_t src = FLASH_BASE + *(uint16_t *)FLASHSIZE_BASE * 1024 / 2;
+uint32_t dest = FLASH_BASE + BOOTLOADER_SIZE;
+uint32_t size = src - dest;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -86,8 +88,10 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
-	move_code();
-	run_app();
+	move_code(src, dest, size);
+	load_app(dest);
+	
+	HAL_NVIC_SystemReset();
   /* USER CODE END 2 */
 
   /* Infinite loop */

@@ -8,6 +8,7 @@
 *.iex
 *.axf
 *.lnp
+*.Bak
 
 # Prerequisites
 *.d
