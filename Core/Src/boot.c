@@ -40,16 +40,6 @@ static s_chip_info chip_info;
 static int8_t move_code(uint32_t src, uint32_t dest, uint32_t size) {
 s_chip_info *chip = read_chip();
 
-	//check source & destination address boundary
-	if(((src % chip->page) != 0) || ((dest % chip->page) != 0)) {
-		return -1;
-	}
-	if((dest < FLASH_BASE) || (dest > FLASH_BASE + chip->ram)) {
-		return -1;
-	}
-	if((size <= 0) || (size > chip->rom - BOOTLOADER_SIZE)) {
-		return -1;
-	}
 	//check SP pointer range
 	if((*(uint32_t *)src >= SRAM_BASE) && (*(uint32_t *)src < (SRAM_BASE + chip->ram))) {
 	static FLASH_EraseInitTypeDef eraseType;
@@ -64,7 +54,9 @@ s_chip_info *chip = read_chip();
 			//copy code form source address to destination address.
 			size = (size + sizeof(uint32_t) - 1)/sizeof(uint32_t);
 			for(uint32_t i=0; i<size; i++) {
-				if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, dest+i*4, ((uint32_t *)src)[i]) != HAL_OK) {
+				if(((uint32_t *)src)[i] == 0xFFFFFF) {
+					continue;
+				} else if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, dest+i*4, ((uint32_t *)src)[i]) != HAL_OK) {
 					HAL_FLASH_Lock();
 					return -1;
 				}
@@ -81,13 +73,14 @@ s_chip_info *chip = read_chip();
 }
 
 //Initialization SP value, set PC to app start address & run app.
-void load_app(uint32_t addr) {
+void load_app(void) {
 s_chip_info *chip = read_chip();
-uint32_t *src = (uint32_t *)addr;
+uint32_t app_addr = FLASH_BASE + BOOTLOADER_SIZE;
+uint32_t *src = (uint32_t *)app_addr;
 uint32_t *dest = (uint32_t *)SRAM_BASE;
 	
 	//move code if needed.
-	move_code(FLASH_BASE+chip->rom/2, FLASH_BASE+BOOTLOADER_SIZE, chip->rom/2 - BOOTLOADER_SIZE);
+	move_code(FLASH_BASE+chip->rom/2, app_addr, chip->rom/2 - BOOTLOADER_SIZE);
 
 	//check SP point to SRAM address range.
 	if((*src >= SRAM_BASE) && (*src < SRAM_BASE+chip->ram)) {
@@ -101,8 +94,8 @@ uint32_t *dest = (uint32_t *)SRAM_BASE;
 		__HAL_RCC_SYSCFG_CLK_ENABLE();
 		__HAL_SYSCFG_REMAPMEMORY_SRAM();
 		//update SP & PC value.
-		__set_MSP(*(uint32_t *)addr);
-		((pfunc)(*((uint32_t *)addr + 1)))();
+		__set_MSP(*(uint32_t *)app_addr);
+		((pfunc)(*((uint32_t *)app_addr + 1)))();
 	}
 }
 

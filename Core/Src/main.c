@@ -86,7 +86,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
-	load_app(FLASH_BASE + BOOTLOADER_SIZE);
+	load_app();
 	
 	HAL_NVIC_SystemReset();
   /* USER CODE END 2 */
