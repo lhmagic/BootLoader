@@ -6,7 +6,7 @@
 #define		VECTOR_TBL_SIZE							(16 + 32)
 #define		BOOTLOADER_SIZE							(2048)
 
-#define		BOOTLOADER_VERSION					"0.1.0"
+#define		BOOTLOADER_VERSION					"0.1.1"
 
 typedef		void (*pfunc)(void);
 typedef struct {

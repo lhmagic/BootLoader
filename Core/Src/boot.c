@@ -89,6 +89,8 @@ uint32_t *dest = (uint32_t *)SRAM_BASE;
 
 	//check SP point to SRAM address range.
 	if((*src >= SRAM_BASE) && (*src < SRAM_BASE+chip->ram)) {
+		//disable irq to avoid program corrupt when use RTOS.
+		__disable_irq();		
 		//copy vectors table to SRAM.
 		for(uint8_t i=0; i<VECTOR_TBL_SIZE; i++) {
 			*dest++ = *src++;
