@@ -6,7 +6,7 @@
 #define		VECTOR_TBL_SIZE							(16 + 32)
 #define		BOOTLOADER_SIZE							(2048)
 
-#define		BOOTLOADER_VERSION					"0.1.1"
+#define		BOOTLOADER_VERSION					"0.1.2"
 
 typedef		void (*pfunc)(void);
 typedef struct {
@@ -18,8 +18,10 @@ typedef struct {
 } s_chip_info;
 
 //public functions prototype
-s_chip_info *read_chip(void);
-int8_t move_code(uint32_t src, uint32_t dest, uint32_t size);
 void load_app(uint32_t addr);
+
+//static functions prototype
+static s_chip_info *read_chip(void);
+static int8_t move_code(uint32_t src, uint32_t dest, uint32_t size);
 
 #endif		//__BOOT_H__

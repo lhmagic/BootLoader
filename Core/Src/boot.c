@@ -10,11 +10,10 @@ const uint8_t chip_cpr_tbl[][3] = {
 	0x42, 		2, 					32				//STM32F030xC/STM32F09x
 };
 
-static s_chip_info chip_info;
-
 //read chip related informations
-s_chip_info *read_chip(void) {
-
+static s_chip_info *read_chip(void) {
+static s_chip_info chip_info;
+	
 	if(chip_info.code == 0) {
 		//chip 96bit UID
 		for(uint8_t i=0; i<3; i++) {
@@ -38,7 +37,7 @@ s_chip_info *read_chip(void) {
 
 //move source code to destination address.
 //the source & destination address must be page alignment.
-int8_t move_code(uint32_t src, uint32_t dest, uint32_t size) {
+static int8_t move_code(uint32_t src, uint32_t dest, uint32_t size) {
 s_chip_info *chip = read_chip();
 
 	//check source & destination address boundary
@@ -86,6 +85,9 @@ void load_app(uint32_t addr) {
 s_chip_info *chip = read_chip();
 uint32_t *src = (uint32_t *)addr;
 uint32_t *dest = (uint32_t *)SRAM_BASE;
+	
+	//move code if needed.
+	move_code(FLASH_BASE+chip->rom/2, FLASH_BASE+BOOTLOADER_SIZE, chip->rom/2 - BOOTLOADER_SIZE);
 
 	//check SP point to SRAM address range.
 	if((*src >= SRAM_BASE) && (*src < SRAM_BASE+chip->ram)) {
